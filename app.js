@@ -1,11 +1,21 @@
 const express = require("express");
 const http = require("https");
+const bodyParser = require("body-Parser");
 
 const app = express();
 
-app.get("/", function (req, res) {
+app.use(bodyParser.urlencoded( {extended: true} ));
 
-  const url = "https://api.openweathermap.org/data/2.5/weather?q=minneapolis&units=imperial&APPID=bcb0bf27f7e2c63d6dd8bd94b5a3154c";
+app.get("/", function (req, res) {
+  res.sendFile(__dirname + "/index.html")
+  });
+
+  app.post("/", function (req, res) {
+
+    const apiKey = "bcb0bf27f7e2c63d6dd8bd94b5a3154c";
+    const query = req.body.CityName;
+    const units = "imperial";
+    const url = "https://api.openweathermap.org/data/2.5/weather?q=" + query + "&units=" + units + "&APPID=" + apiKey;
 
   http.get(url, function(response){
     console.log(response.statusCode);
@@ -16,7 +26,7 @@ app.get("/", function (req, res) {
       const weather = weatherData.weather[0].description
       const icon = weatherData.weather[0].icon
       const imageURL = "http://openweathermap.org/img/wn/" + icon + "@2x.png"
-      res.write("<p>The temperature in Minneapolis is " + temp + " degrees</p>")
+      res.write("<p>The temperature in " + query + " is " + temp + " degrees</p>")
       res.write("<p>The weather is currently " + weather + "</p>")
       res.write("<img src=" + imageURL +">")
       res.send()
